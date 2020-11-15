@@ -1,0 +1,27 @@
+{
+  "name": "toc-toc.js",
+  "version": "0.1.0",
+  "description": "Generates a Table of Contents from a CSS selector",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/t-richard/toc-toc.git"
+  },
+  "keywords": [
+    "toc",
+    "css",
+    "html",
+    "table",
+    "of",
+    "contents"
+  ],
+  "author": "Thibault RICHARD & Pierre MAES",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/t-richard/toc-toc/issues"
+  },
+  "homepage": "https://github.com/t-richard/toc-toc#readme"
+}
