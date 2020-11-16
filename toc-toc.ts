@@ -3,10 +3,6 @@ class HelloWorld extends HTMLElement {
     this.innerHTML = `<h1>Hello ${this.name}.</h1>`
   }
 
-  static get observedAttributes() {
-    return ['name'];
-  }
-
   get name() {
     return this.getAttribute('name');
   }
