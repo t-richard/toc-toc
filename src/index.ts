@@ -1,4 +1,4 @@
-class TocToc extends HTMLElement {
+class Index extends HTMLElement {
   connectedCallback() {
     this.createTOC();
   }
@@ -52,7 +52,7 @@ class TocToc extends HTMLElement {
   }
 
   get titleElements() {
-    return this.targetElement.querySelectorAll(
+    return <HTMLElement[]><any>this.targetElement.querySelectorAll(
         [this.primary, this.secondary, this.tertiary].join(',')
     );
   }
@@ -92,4 +92,4 @@ class TocToc extends HTMLElement {
   }
 }
 
-customElements.define('toc-toc', TocToc);
+customElements.define('toc-toc', Index);
