@@ -1,15 +1,34 @@
-class HelloWorld extends HTMLElement {
+class TocToc extends HTMLElement {
   connectedCallback() {
-    this.innerHTML = `<h1>Hello ${this.name}.</h1>`
+    this.createTOC();
   }
 
-  get name() {
-    return this.getAttribute('name');
+  get target() {
+    return this.getAttribute('target');
   }
 
-  set name(newValue) {
-    this.setAttribute('name', newValue);
+  set target(newValue) {
+    this.setAttribute('target', newValue);
   }
+
+  get targetElement() {
+    return document.querySelector(this.target);
+  }
+
+  get titles() {
+    const target = this.targetElement;
+    const titres = target.querySelectorAll("h1, h2, h3, h4, h5, h6");
+    console.log(titres);
+    return titres;
+  }
+
+  createTOC() {
+    const titles = this.titles;
+    titles.forEach(title => {
+      this.innerHTML += `<h2>${title.innerHTML}</h2>`
+    });
+  }
+
 }
 
-customElements.define('hello-world', HelloWorld);
+customElements.define('toc-toc', TocToc);
