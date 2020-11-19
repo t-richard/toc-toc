@@ -39,18 +39,6 @@ class Index extends HTMLElement {
     return document.querySelector(this.target);
   }
 
-  get primaryElements() {
-    return document.querySelectorAll(this.primary);
-  }
-
-  get secondaryElements() {
-    return document.querySelectorAll(this.secondary);
-  }
-
-  get tertiaryElements() {
-    return document.querySelectorAll(this.tertiary);
-  }
-
   get titleElements() {
     return <HTMLElement[]><any>this.targetElement.querySelectorAll(
         [this.primary, this.secondary, this.tertiary].join(',')
@@ -64,28 +52,43 @@ class Index extends HTMLElement {
       if (!title.id) {
         title.id = this.slugify(title.innerText);
       }
-      if (title.matches(this.primary)) {
-        if (!primaryList) primaryList = this.createList(this);
+
+      const levelInt =
+        title.matches(this.primary) ? 1 :
+        title.matches(this.secondary) ? 2 :
+        title.matches(this.tertiary) ? 3 : -1;
+
+      if (levelInt === 1 || (levelInt >= 1 && !primaryList)) {
+        primaryList = this.generatePrimaryList(primaryList, levelInt === 1 ? title : null);
         secondaryList = null;
         tertiaryList = null;
-        this.createItem(primaryList, title, 'primary');
       }
-      if (title.matches(this.secondary)) {
-        if (!primaryList) secondaryList = this.createList(this);
-        this.createItem(secondaryList, null, 'primary');
-        if (!secondaryList) secondaryList = this.createList(primaryList.lastChild);
+      if (levelInt === 2|| (levelInt >= 2 && !secondaryList)) {
+        secondaryList = this.generateSecondaryList(primaryList, secondaryList, levelInt === 2 ? title : null);
         tertiaryList = null;
-        this.createItem(secondaryList, title, 'secondary');
       }
-      if (title.matches(this.tertiary)) {
-        if (!primaryList) secondaryList = this.createList(this);
-        this.createItem(secondaryList, null, 'primary');
-        if (!secondaryList) secondaryList = this.createList(primaryList.lastChild);
-        this.createItem(secondaryList, null, 'secondary');
-        if (!tertiaryList) tertiaryList = this.createList(secondaryList.lastChild);
-        this.createItem(tertiaryList, title, 'tertiary');
+      if (levelInt === 3 || (levelInt >= 3 && !tertiaryList)) {
+        tertiaryList = this.generateTertiaryList(secondaryList, tertiaryList, levelInt === 3 ? title : null);
       }
     });
+  }
+
+  private generateTertiaryList(secondaryList, tertiaryList, title: HTMLElement) {
+    return this.generateList(secondaryList.lastChild, tertiaryList, title, 'tertiary');
+  }
+
+  private generateSecondaryList(primaryList, secondaryList, title: HTMLElement) {
+    return this.generateList(primaryList.lastChild, secondaryList, title, 'secondary');
+  }
+
+  private generatePrimaryList(primaryList, title: HTMLElement) {
+    return this.generateList(this, primaryList, title, 'primary');
+  }
+
+  private generateList(parent, current, title: HTMLElement, level: string) {
+    if (!current) current = this.createList(parent);
+    this.createItem(current, title, level);
+    return current;
   }
 
   createList(parent: HTMLElement): HTMLElement {
