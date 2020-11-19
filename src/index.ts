@@ -39,18 +39,6 @@ class Index extends HTMLElement {
     return document.querySelector(this.target);
   }
 
-  get primaryElements() {
-    return document.querySelectorAll(this.primary);
-  }
-
-  get secondaryElements() {
-    return document.querySelectorAll(this.secondary);
-  }
-
-  get tertiaryElements() {
-    return document.querySelectorAll(this.tertiary);
-  }
-
   get titleElements() {
     return <HTMLElement[]><any>this.targetElement.querySelectorAll(
         [this.primary, this.secondary, this.tertiary].join(',')
@@ -58,20 +46,69 @@ class Index extends HTMLElement {
   }
 
   createTOC() {
+    let primaryList, secondaryList, tertiaryList;
+
     this.titleElements.forEach(title => {
       if (!title.id) {
         title.id = this.slugify(title.innerText);
       }
-      if (title.matches(this.primary)) {
-        this.innerHTML += `<div class="toc-primary"><a href="#${title.id}">${title.innerText}</a></div>`
+
+      const levelInt =
+        title.matches(this.primary) ? 1 :
+        title.matches(this.secondary) ? 2 :
+        title.matches(this.tertiary) ? 3 : -1;
+
+      if (levelInt === 1 || (levelInt >= 1 && !primaryList)) {
+        primaryList = this.generatePrimaryList(primaryList, levelInt === 1 ? title : null);
+        secondaryList = null;
+        tertiaryList = null;
       }
-      if (title.matches(this.secondary)) {
-        this.innerHTML += `<div class="toc-secondary"><a href="#${title.id}">${title.innerText}</a></div>`
+      if (levelInt === 2|| (levelInt >= 2 && !secondaryList)) {
+        secondaryList = this.generateSecondaryList(primaryList, secondaryList, levelInt === 2 ? title : null);
+        tertiaryList = null;
       }
-      if (title.matches(this.tertiary)) {
-        this.innerHTML += `<div class="toc-tertiary"><a href="#${title.id}">${title.innerText}</a></div>`
+      if (levelInt === 3 || (levelInt >= 3 && !tertiaryList)) {
+        tertiaryList = this.generateTertiaryList(secondaryList, tertiaryList, levelInt === 3 ? title : null);
       }
     });
+  }
+
+  private generateTertiaryList(secondaryList, tertiaryList, title: HTMLElement) {
+    return this.generateList(secondaryList.lastChild, tertiaryList, title, 'tertiary');
+  }
+
+  private generateSecondaryList(primaryList, secondaryList, title: HTMLElement) {
+    return this.generateList(primaryList.lastChild, secondaryList, title, 'secondary');
+  }
+
+  private generatePrimaryList(primaryList, title: HTMLElement) {
+    return this.generateList(this, primaryList, title, 'primary');
+  }
+
+  private generateList(parent, current, title: HTMLElement, level: string) {
+    if (!current) current = this.createList(parent);
+    this.createItem(current, title, level);
+    return current;
+  }
+
+  createList(parent: HTMLElement): HTMLElement {
+    return parent.appendChild(document.createElement('ul'));
+  }
+
+  createItem(parent: HTMLElement, title: HTMLElement, level: string): HTMLElement {
+    const li = document.createElement('li');
+    li.classList.add(`toc-${level}`);
+
+    if (title) {
+      const link = document.createElement('a');
+      link.href = `#${title.id}`;
+      link.innerHTML = title.innerText;
+      li.appendChild(link);
+    } else {
+      li.style.listStyle = 'none';
+    }
+
+    return parent.appendChild(li);
   }
 
   slugify(str) {
