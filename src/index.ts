@@ -58,20 +58,54 @@ class Index extends HTMLElement {
   }
 
   createTOC() {
+    let primaryList, secondaryList, tertiaryList;
+
     this.titleElements.forEach(title => {
       if (!title.id) {
         title.id = this.slugify(title.innerText);
       }
       if (title.matches(this.primary)) {
-        this.innerHTML += `<div class="toc-primary"><a href="#${title.id}">${title.innerText}</a></div>`
+        if (!primaryList) primaryList = this.createList(this);
+        secondaryList = null;
+        tertiaryList = null;
+        this.createItem(primaryList, title, 'primary');
       }
       if (title.matches(this.secondary)) {
-        this.innerHTML += `<div class="toc-secondary"><a href="#${title.id}">${title.innerText}</a></div>`
+        if (!primaryList) secondaryList = this.createList(this);
+        this.createItem(secondaryList, null, 'primary');
+        if (!secondaryList) secondaryList = this.createList(primaryList.lastChild);
+        tertiaryList = null;
+        this.createItem(secondaryList, title, 'secondary');
       }
       if (title.matches(this.tertiary)) {
-        this.innerHTML += `<div class="toc-tertiary"><a href="#${title.id}">${title.innerText}</a></div>`
+        if (!primaryList) secondaryList = this.createList(this);
+        this.createItem(secondaryList, null, 'primary');
+        if (!secondaryList) secondaryList = this.createList(primaryList.lastChild);
+        this.createItem(secondaryList, null, 'secondary');
+        if (!tertiaryList) tertiaryList = this.createList(secondaryList.lastChild);
+        this.createItem(tertiaryList, title, 'tertiary');
       }
     });
+  }
+
+  createList(parent: HTMLElement): HTMLElement {
+    return parent.appendChild(document.createElement('ul'));
+  }
+
+  createItem(parent: HTMLElement, title: HTMLElement, level: string): HTMLElement {
+    const li = document.createElement('li');
+    li.classList.add(`toc-${level}`);
+
+    if (title) {
+      const link = document.createElement('a');
+      link.href = `#${title.id}`;
+      link.innerHTML = title.innerText;
+      li.appendChild(link);
+    } else {
+      li.style.listStyle = 'none';
+    }
+
+    return parent.appendChild(li);
   }
 
   slugify(str) {
