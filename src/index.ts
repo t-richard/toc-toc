@@ -1,6 +1,8 @@
 class Index extends HTMLElement {
   connectedCallback() {
     this.createTOC();
+    const button = document.querySelector("#menu-button").addEventListener("click",() => this.showList());
+
   }
 
   get target() {
@@ -47,6 +49,8 @@ class Index extends HTMLElement {
 
   createTOC() {
     let primaryList, secondaryList, tertiaryList;
+
+    this.importCSS();
 
     this.titleElements.forEach(title => {
       if (!title.id) {
@@ -127,6 +131,73 @@ class Index extends HTMLElement {
         .replace(/-+/g, '-');
 
     return str;
+  }
+
+  showList(){
+    if (this.classList.contains("hidden")){
+      this.classList.remove("hidden")
+    } else {
+      this.classList.add("hidden");
+    }
+  }
+
+  importCSS(){
+    this.innerHTML +=
+        `<style type="text/css">
+            toc-toc.tiles a{
+                color: black;
+                text-decoration: none;
+            }
+            
+            toc-toc a.selected{
+                font-weight: bold;
+            }
+            
+            toc-toc.hidden {
+                display: none;
+                transition-duration: 1000ms;
+            }
+            
+            .stick-left{
+                position: fixed;
+                overflow: auto;
+                left: 0;
+                top: 0;
+                background-color: white;
+                max-width: 300px;
+                height: 100vh;
+                box-shadow: 5px 0px 5px gray;
+            }
+            
+            .tiles a{
+                border-bottom: 1px solid lightgrey;
+                padding: 5px;
+                display: block;
+            }
+            
+            .tiles a:hover{
+                background-color: #e0e0e0;
+                transition-duration: 300ms;
+
+            }
+            
+            ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+            }
+            .toc-primary a{
+                font-size: 1.6rem;
+            }
+            .toc-secondary a{
+                font-size: 1.4rem;
+                padding-left: 20px;
+            }
+            .toc-tertiary a{
+                font-size: 1.2rem;
+                padding-left: 20px;
+            }
+        </style>`;
   }
 }
 
