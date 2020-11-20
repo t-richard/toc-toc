@@ -1,8 +1,6 @@
-class Index extends HTMLElement {
+class TocToc extends HTMLElement {
   connectedCallback() {
     this.createTOC();
-    const button = document.querySelector("#menu-button").addEventListener("click",() => this.showList());
-
   }
 
   get target() {
@@ -37,6 +35,10 @@ class Index extends HTMLElement {
     this.setAttribute('tertiary', newValue);
   }
 
+  get scrollspy() {
+    return this.hasAttribute('scrollspy');
+  }
+
   get targetElement() {
     return document.querySelector(this.target);
   }
@@ -49,8 +51,6 @@ class Index extends HTMLElement {
 
   createTOC() {
     let primaryList, secondaryList, tertiaryList;
-
-    this.importCSS();
 
     this.titleElements.forEach(title => {
       if (!title.id) {
@@ -75,6 +75,29 @@ class Index extends HTMLElement {
         tertiaryList = this.generateTertiaryList(secondaryList, tertiaryList, levelInt === 3 ? title : null);
       }
     });
+
+    if (this.scrollspy) {
+      document.addEventListener('scroll', ev => {
+        const top1 = Array.from(this.titleElements).find(element => TocToc.inViewPort(element));
+        this.querySelectorAll(`a.active:not([href="#${top1.id}"])`).forEach(element => element.classList.remove('active'));
+        let element1: HTMLElement = this.querySelector(`a[href="#${top1.id}"]`);
+        element1.classList.add('active');
+        element1.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'start' })
+      });
+    }
+
+    this.importCSS();
+  }
+
+  private static inViewPort(element) {
+    const rect = element.getBoundingClientRect();
+    return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <=
+        (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
   }
 
   private generateTertiaryList(secondaryList, tertiaryList, title: HTMLElement) {
@@ -144,12 +167,12 @@ class Index extends HTMLElement {
   importCSS(){
     this.innerHTML +=
         `<style type="text/css">
-            toc-toc.tiles a{
+            toc-toc.tiles a {
                 color: black;
                 text-decoration: none;
             }
             
-            toc-toc a.selected{
+            toc-toc a.selected {
                 font-weight: bold;
             }
             
@@ -158,7 +181,7 @@ class Index extends HTMLElement {
                 transition-duration: 1000ms;
             }
             
-            .stick-left{
+            .stick-left {
                 position: fixed;
                 overflow: auto;
                 left: 0;
@@ -166,19 +189,18 @@ class Index extends HTMLElement {
                 background-color: white;
                 max-width: 300px;
                 height: 100vh;
-                box-shadow: 5px 0px 5px gray;
+                box-shadow: 5px 0 5px gray;
             }
             
-            .tiles a{
+            .tiles a {
                 border-bottom: 1px solid lightgrey;
                 padding: 5px;
                 display: block;
             }
             
-            .tiles a:hover{
+            .tiles a:hover, .tiles a.active {
                 background-color: #e0e0e0;
                 transition-duration: 300ms;
-
             }
             
             ul {
@@ -186,19 +208,19 @@ class Index extends HTMLElement {
                 margin: 0;
                 padding: 0;
             }
-            .toc-primary a{
+            .toc-primary a {
                 font-size: 1.6rem;
             }
-            .toc-secondary a{
+            .toc-secondary a {
                 font-size: 1.4rem;
                 padding-left: 20px;
             }
-            .toc-tertiary a{
+            .toc-tertiary a {
                 font-size: 1.2rem;
-                padding-left: 20px;
+                padding-left: 40px;
             }
         </style>`;
   }
 }
 
-customElements.define('toc-toc', Index);
+customElements.define('toc-toc', TocToc);

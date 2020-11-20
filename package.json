@@ -2,7 +2,7 @@
   "name": "toc-toc.js",
   "version": "0.1.0",
   "description": "Generates a Table of Contents from a CSS selector",
-  "main": "dist/index.js",
+  "main": "dist/toc-toc.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
