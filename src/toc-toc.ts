@@ -1,4 +1,4 @@
-class Index extends HTMLElement {
+class TocToc extends HTMLElement {
   connectedCallback() {
     this.createTOC();
   }
@@ -33,6 +33,18 @@ class Index extends HTMLElement {
 
   set tertiary(newValue) {
     this.setAttribute('tertiary', newValue);
+  }
+
+  get scrollspy() {
+    return this.hasAttribute('scrollspy');
+  }
+
+  get ordered() {
+    return this.hasAttribute('ordered');
+  }
+
+  get bullet() {
+    return this.hasAttribute('bullet');
   }
 
   get targetElement() {
@@ -71,6 +83,29 @@ class Index extends HTMLElement {
         tertiaryList = this.generateTertiaryList(secondaryList, tertiaryList, levelInt === 3 ? title : null);
       }
     });
+
+    if (this.scrollspy) {
+      document.addEventListener('scroll', ev => {
+        const top1 = Array.from(this.titleElements).find(element => TocToc.inViewPort(element));
+        this.querySelectorAll(`a.active:not([href="#${top1.id}"])`).forEach(element => element.classList.remove('active'));
+        let element1: HTMLElement = this.querySelector(`a[href="#${top1.id}"]`);
+        element1.classList.add('active');
+        element1.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'start' })
+      });
+    }
+
+    this.importCSS();
+  }
+
+  private static inViewPort(element) {
+    const rect = element.getBoundingClientRect();
+    return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <=
+        (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
   }
 
   private generateTertiaryList(secondaryList, tertiaryList, title: HTMLElement) {
@@ -92,7 +127,9 @@ class Index extends HTMLElement {
   }
 
   createList(parent: HTMLElement): HTMLElement {
-    return parent.appendChild(document.createElement('ul'));
+    let listElement = parent.appendChild(document.createElement(this.ordered ? 'ol' : 'ul'));
+    !(this.ordered || this.bullet) ? listElement.classList.add('no-list') : undefined;
+    return listElement;
   }
 
   createItem(parent: HTMLElement, title: HTMLElement, level: string): HTMLElement {
@@ -128,6 +165,84 @@ class Index extends HTMLElement {
 
     return str;
   }
+
+  showList(){
+    if (this.classList.contains("hidden")){
+      this.classList.remove("hidden")
+    } else {
+      this.classList.add("hidden");
+    }
+  }
+
+  importCSS(){
+    this.innerHTML +=
+        `<style type="text/css">
+            toc-toc.tiles a {
+                color: black;
+                text-decoration: none;
+            }
+            
+            toc-toc a.selected {
+                font-weight: bold;
+            }
+            
+            toc-toc.hidden {
+                display: none;
+                transition-duration: 1000ms;
+            }
+            
+            toc-toc.stick-left {
+                position: fixed;
+                overflow: auto;
+                left: 0;
+                top: 0;
+                background-color: white;
+                max-width: 300px;
+                height: 100vh;
+                box-shadow: 5px 0 5px gray;
+            }
+            
+            toc-toc.tiles a {
+                border-bottom: 1px solid lightgrey;
+                padding: 5px;
+                display: block;
+            }
+            
+            toc-toc.tiles a:hover, toc-toc.tiles a.active {
+                background-color: #e0e0e0;
+                transition-duration: 300ms;
+            }
+            
+            toc-toc ul {
+                margin: 0;
+            }      
+            
+            toc-toc ul.no-list {
+                list-style-type: none;
+                padding: 0;
+            }
+            
+            toc-toc ol .toc-secondary {
+                list-style: upper-alpha;
+            }
+            
+            toc-toc ol .toc-tertiary {
+                list-style: lower-alpha;
+            }
+            
+            .toc-primary a {
+                font-size: 1.6rem;
+            }
+            .toc-secondary a {
+                font-size: 1.4rem;
+                padding-left: 20px;
+            }
+            .toc-tertiary a {
+                font-size: 1.2rem;
+                padding-left: 40px;
+            }
+        </style>`;
+  }
 }
 
-customElements.define('toc-toc', Index);
+customElements.define('toc-toc', TocToc);
