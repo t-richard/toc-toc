@@ -191,7 +191,7 @@ class TocToc extends HTMLElement {
                 transition-duration: 1000ms;
             }
             
-            .stick-left {
+            toc-toc.stick-left {
                 position: fixed;
                 overflow: auto;
                 left: 0;
@@ -202,13 +202,13 @@ class TocToc extends HTMLElement {
                 box-shadow: 5px 0 5px gray;
             }
             
-            .tiles a {
+            toc-toc.tiles a {
                 border-bottom: 1px solid lightgrey;
                 padding: 5px;
                 display: block;
             }
             
-            .tiles a:hover, .tiles a.active {
+            toc-toc.tiles a:hover, toc-toc.tiles a.active {
                 background-color: #e0e0e0;
                 transition-duration: 300ms;
             }
