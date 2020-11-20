@@ -39,6 +39,14 @@ class TocToc extends HTMLElement {
     return this.hasAttribute('scrollspy');
   }
 
+  get ordered() {
+    return this.hasAttribute('ordered');
+  }
+
+  get bullet() {
+    return this.hasAttribute('bullet');
+  }
+
   get targetElement() {
     return document.querySelector(this.target);
   }
@@ -119,7 +127,9 @@ class TocToc extends HTMLElement {
   }
 
   createList(parent: HTMLElement): HTMLElement {
-    return parent.appendChild(document.createElement('ul'));
+    let listElement = parent.appendChild(document.createElement(this.ordered ? 'ol' : 'ul'));
+    !(this.ordered || this.bullet) ? listElement.classList.add('no-list') : undefined;
+    return listElement;
   }
 
   createItem(parent: HTMLElement, title: HTMLElement, level: string): HTMLElement {
@@ -203,11 +213,23 @@ class TocToc extends HTMLElement {
                 transition-duration: 300ms;
             }
             
-            ul {
-                list-style-type: none;
+            toc-toc ul {
                 margin: 0;
+            }      
+            
+            toc-toc ul.no-list {
+                list-style-type: none;
                 padding: 0;
             }
+            
+            toc-toc ol .toc-secondary {
+                list-style: upper-alpha;
+            }
+            
+            toc-toc ol .toc-tertiary {
+                list-style: lower-alpha;
+            }
+            
             .toc-primary a {
                 font-size: 1.6rem;
             }
