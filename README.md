@@ -43,6 +43,13 @@ By default it will generate a table of content using :
 * `<h2>` tags for secondary titles
 * `<h3><h4><h5><h6>` tags for tertiary titles
 
+The generated list will be composed of nested lists (`<ul>` elements), each title represented by
+a list item (`<li>` elements).
+
+The list will not have any style by default and will inherit from your CSS style if any (font-size, font-family, `<a>` style, ...).
+
+See the [Style section](#style) for further details.
+
 ## Configuration options
 
 ### `target` 
@@ -113,7 +120,7 @@ Whether the scroll listener should be registered. Omit the attribute to disable 
 This will apply the `active` class to the highest currently visible element in the TOC.
 
 Example:
-```
+```html
 <toc-toc scrollspy></toc-toc>
 ``` 
 
